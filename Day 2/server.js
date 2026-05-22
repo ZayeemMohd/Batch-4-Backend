@@ -1,11 +1,15 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
+
+const filePath = path.join(__dirname, "todo.json");
 
 const app = express();
 
 // extract json form body
 app.use(express.json());
 
-let todoArr = ["go to gym", "go to collge"];
+let todoArr = JSON.parse(fs.readFileSync(filePath, "utf8"));
 
 app.get("/todos", (req, res) => {
   res.json(todoArr);
@@ -13,6 +17,7 @@ app.get("/todos", (req, res) => {
 
 app.post("/todo", (req, res) => {
   todoArr.push(req.body.todo);
+  fs.writeFileSync(filePath, JSON.stringify(todoArr));
   res.json({ message: "todo added successfully" });
 });
 
@@ -22,6 +27,8 @@ app.delete("/todo", (req, res) => {
   todoArr = todoArr.filter((todo) => {
     return delTodo !== todo;
   });
+
+  fs.writeFileSync(filePath, JSON.stringify(todoArr));
 
   res.json({ message: "todo deleted successfully" });
 });
@@ -34,6 +41,8 @@ app.put("/todo", (req, res) => {
       todoArr.splice(index, 1, updateTodo);
     }
   });
+
+  fs.writeFileSync(filePath, JSON.stringify(todoArr));
 
   res.json({ message: "todo updated successfully" });
 });
