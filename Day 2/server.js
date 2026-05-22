@@ -2,24 +2,43 @@ const express = require("express");
 
 const app = express();
 
+// extract json form body
+app.use(express.json());
 
-app.get("/api/restaurants", (request, response)=>{
-    response.json({resName: 'mehfil', resId: 275345, })
+let todoArr = ["go to gym", "go to collge"];
+
+app.get("/todos", (req, res) => {
+  res.json(todoArr);
 });
 
+app.post("/todo", (req, res) => {
+  todoArr.push(req.body.todo);
+  res.json({ message: "todo added successfully" });
+});
 
-app.get("/api/menu", (req, res)=>{
-    res.json({itemName: "paneer tikka masala"})
-})
+app.delete("/todo", (req, res) => {
+  const delTodo = req.body.delTodo;
 
-app.get("/api/user", (req,res)=>{
-    res.json({
-        username: "Ismail",
-        profilURL: "https://ik.imagekit.io/acrrubsd0/default-image.jpg?updatedAt=1770155875615"
-    })
-})
+  todoArr = todoArr.filter((todo) => {
+    return delTodo !== todo;
+  });
+
+  res.json({ message: "todo deleted successfully" });
+});
+
+app.put("/todo", (req, res) => {
+  const { existingTodo, updateTodo } = req.body;
+
+  todoArr.forEach((todo, index) => {
+    if (existingTodo == todo) {
+      todoArr.splice(index, 1, updateTodo);
+    }
+  });
+
+  res.json({ message: "todo updated successfully" });
+});
 
 const PORT = 8080;
-app.listen(PORT ,()=>{
-    console.log("server is listening on port 8080")
+app.listen(PORT, () => {
+  console.log("server is listening on port 8080");
 });
